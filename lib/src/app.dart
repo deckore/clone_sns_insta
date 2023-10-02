@@ -3,6 +3,8 @@ import './components/image_data.dart';
 import './controller/bottom_nav_controller.dart';
 import 'package:get/get.dart';
 
+import 'pages/home.dart';
+
 class App extends GetView<BottomNavController> { //StatelessWidget {
   const App({Key? key}) : super(key: key);
 
@@ -11,11 +13,11 @@ class App extends GetView<BottomNavController> { //StatelessWidget {
     return WillPopScope(
       child: Obx(() => Scaffold(
         backgroundColor: Colors.indigoAccent,
-        appBar: AppBar(),
+        //appBar: AppBar(),
         body: IndexedStack(
           index: controller.pageIndex.value,
           children: [
-            Container(child: Center(child: Text("HOME")),),
+            const Home(),
             Container(child: Center(child: Text("SEARCH")),),
             Container(child: Center(child: Text("UPLOAD")),),
             Container(child: Center(child: Text("ACTIVITY")),),
