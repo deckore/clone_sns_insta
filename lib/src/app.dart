@@ -4,6 +4,7 @@ import './controller/bottom_nav_controller.dart';
 import 'package:get/get.dart';
 
 import 'pages/home.dart';
+import 'pages/search.dart';
 
 class App extends GetView<BottomNavController> { //StatelessWidget {
   const App({Key? key}) : super(key: key);
@@ -18,7 +19,7 @@ class App extends GetView<BottomNavController> { //StatelessWidget {
           index: controller.pageIndex.value,
           children: [
             const Home(),
-            Container(child: Center(child: Text("SEARCH")),),
+            const Search(),
             Container(child: Center(child: Text("UPLOAD")),),
             Container(child: Center(child: Text("ACTIVITY")),),
             Container(child: Center(child: Text("MYPAGE")),),
