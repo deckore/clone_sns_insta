@@ -19,7 +19,14 @@ class App extends GetView<BottomNavController> { //StatelessWidget {
           index: controller.pageIndex.value,
           children: [
             const Home(),
-            const Search(),
+            Navigator(
+              key: controller.searchPageNavigationKey,
+              onGenerateRoute: (routeSetting) {
+                return MaterialPageRoute(
+                  builder:(context) => const Search(),
+                );
+              },
+            ),
             Container(child: Center(child: Text("UPLOAD")),),
             Container(child: Center(child: Text("ACTIVITY")),),
             Container(child: Center(child: Text("MYPAGE")),),
