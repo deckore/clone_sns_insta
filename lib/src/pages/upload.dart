@@ -15,57 +15,63 @@ class Upload extends StatelessWidget {
   }
 
   Widget _header() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: const [
-                Text(
-                  "갤러리",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(
+            color: Colors.indigo, width: 2, style: BorderStyle.solid),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: const [
+                  Text(
+                    "갤러리",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                    ),
                   ),
+                  Icon(Icons.arrow_drop_down),
+                ],
+              ),
+            ),
+            Row(
+              children: [
+                Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xff808080),
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: Row(
+                      children: [
+                        ImageData(IconsPath.imageSelectIcon),
+                        const SizedBox(width: 7),
+                        const Text(
+                          "여러 항목 선택",
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                        ),
+                      ],
+                    )),
+                const SizedBox(width: 4),
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xff808080),
+                  ),
+                  child: ImageData(IconsPath.cameraIcon),
                 ),
-                Icon(Icons.arrow_drop_down),
               ],
             ),
-          ),
-          Row(
-            children: [
-              Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xff808080),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Row(
-                    children: [
-                      ImageData(IconsPath.imageSelectIcon),
-                      const SizedBox(width: 7),
-                      const Text(
-                        "여러 항목 선택",
-                        style: TextStyle(color: Colors.white, fontSize: 14),
-                      ),
-                    ],
-                  )),
-              const SizedBox(width: 4),
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Color(0xff808080),
-                ),
-                child: ImageData(IconsPath.cameraIcon),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -122,11 +128,22 @@ class Upload extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
+        // scrollDirection: Axis.vertical,
         child: Column(
           children: [
             _imagePreview(),
             _header(),
             // _imageSelectList(),
+            /**
+             * SingleChildScrollView 아래 GridView.builder를 직접 사용하는 경우
+             * 빌드가 되지 않는 현상이 발생하여 SizedBox로 감싼 후
+             * 일단 Get.height로 지정해 둠
+             */
+            SizedBox(
+              height: Get.height,
+              width: Get.width,
+              child: _imageSelectList(),
+            ),
           ],
         ),
       ),
