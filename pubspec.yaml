@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.6.5
+  photo_manager: ^2.7.1
   quiver: ^3.2.1
 
 dev_dependencies:

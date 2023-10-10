@@ -1,15 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:photo_manager/photo_manager.dart';
+// import 'package:get/get.dart';
 
 import '../components/image_data.dart';
 
-class Upload extends StatelessWidget {
+class Upload extends StatefulWidget {
   const Upload({Key? key}) : super(key: key);
 
+  @override
+  State<Upload> createState() => _UploadState();
+}
+
+class _UploadState extends State<Upload> {
+  List<AssetPathEntity> albums = <AssetPathEntity>[];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPhotos();
+  }
+
+  void _loadPhotos() async {
+    var result = await PhotoManager.requestPermissionExtend();
+    if (result.isAuth) {
+      albums = await PhotoManager.getAssetPathList(
+        type: RequestType.image,
+        filterOption: FilterOptionGroup(
+          imageOption: const FilterOption(
+            sizeConstraint: SizeConstraint(minHeight: 100, minWidth: 100),
+          ),
+          orders: [
+            const OrderOption(type: OrderOptionType.createDate, asc: false),
+          ],
+        ),
+      );
+      _loadData();
+    }
+  }
+
+  void _loadData() async {
+    print(albums.first.name);
+  }
+
   Widget _imagePreview() {
+    /* GetX 의존성 제거 */
+    var width = MediaQuery.of(context).size.width;
     return Container(
-      width: Get.width,
-      height: Get.width,
+      // width: Get.width,
+      // height: Get.width,
+      width: width,
+      height: width,
       color: Colors.grey,
     );
   }
@@ -102,7 +142,8 @@ class Upload extends StatelessWidget {
         elevation: 0,
         leading: GestureDetector(
           onTap: () {
-            Get.back();
+            // Get.back();
+            Navigator.of(context).pop();
           },
           child: Padding(
             padding: const EdgeInsets.all(15.0),
@@ -140,8 +181,10 @@ class Upload extends StatelessWidget {
              * 일단 Get.height로 지정해 둠
              */
             SizedBox(
-              height: Get.height,
-              width: Get.width,
+              // width: Get.width,
+              // height: Get.height,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
               child: _imageSelectList(),
             ),
           ],
