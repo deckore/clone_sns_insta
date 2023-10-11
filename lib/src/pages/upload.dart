@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:photo_manager/photo_manager.dart';
 // import 'package:get/get.dart';
@@ -13,6 +15,9 @@ class Upload extends StatefulWidget {
 
 class _UploadState extends State<Upload> {
   List<AssetPathEntity> albums = <AssetPathEntity>[];
+  var headerTitle = '';
+  var imageList = <AssetEntity>[];
+  AssetEntity? selectedImage;
 
   @override
   void initState() {
@@ -34,13 +39,31 @@ class _UploadState extends State<Upload> {
           ],
         ),
       );
+      // Test Code
+      /*
+      albums.addAll([
+        AssetPathEntity()..name = '1',
+        AssetPathEntity()..name = '1',
+        AssetPathEntity()..name = '1',
+      ]);
+      */
       _loadData();
     }
   }
 
   void _loadData() async {
-    print(albums.first.name);
+    headerTitle = albums.first.name;
+    await _pagingPhotos();
+    update();
   }
+
+  Future<void> _pagingPhotos() async {
+    var photos = await albums.first.getAssetListPaged(page: 0, size: 30);
+    imageList.addAll(photos);
+    selectedImage = imageList.first;
+  }
+
+  void update() => setState(() {});
 
   Widget _imagePreview() {
     /* GetX 의존성 제거 */
@@ -51,6 +74,13 @@ class _UploadState extends State<Upload> {
       width: width,
       height: width,
       color: Colors.grey,
+      child: selectedImage == null
+           ? Container()
+           : _photoWidget(selectedImage!, width.toInt(),
+              builder: (data) {
+                return Image.memory(data, fit: BoxFit.cover);
+              }
+             ),
     );
   }
 
@@ -60,19 +90,69 @@ class _UploadState extends State<Upload> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: const [
-                Text(
-                  "갤러리",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
+          GestureDetector(
+            onTap:() {
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                ),
+                isScrollControlled: true,
+                constraints: BoxConstraints(
+                  // SafeArea를 제외한 나머지 영역까지
+                  maxHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top
+                ),
+                builder: (_) => Container(
+                  height: albums.length > 10
+                        ? Size.infinite.height
+                        : albums.length * 60,
+                  // color: Colors.amber,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(top: 8, bottom: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.black54,
+                          ),
+                          width: 40,
+                          height: 4,
+                        ),
+                      ),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(
+                              albums.length,
+                              (index) => Container(
+                                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                                child: Text(albums[index].name),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Icon(Icons.arrow_drop_down),
-              ],
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Text(
+                    headerTitle,
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const Icon(Icons.arrow_drop_down),
+                ],
+              ),
             ),
           ),
           Row(
@@ -120,11 +200,53 @@ class _UploadState extends State<Upload> {
           mainAxisSpacing: 1,
           crossAxisSpacing: 1,
         ),
+        itemCount: imageList.length,
         itemBuilder: (BuildContext context, int index) {
-          return Container(
-            color: Colors.red,
+          return _photoWidget(
+            imageList[index], 200,
+            builder: (data) {
+              return GestureDetector(
+                onTap:() {
+                  selectedImage = imageList[index];
+                  update();
+                },
+                child: Opacity(
+                  opacity: imageList[index] == selectedImage ? 0.3 : 1,
+                  child: Image.memory(
+                    data,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            }
           );
         });
+  }
+
+  Widget _photoWidget(AssetEntity asset, int size,
+    {
+      required Widget Function(Uint8List) builder
+    }
+  ) {
+    return FutureBuilder(
+      future: asset.thumbnailDataWithSize(ThumbnailSize(size, size)),
+      builder: (_, AsyncSnapshot<Uint8List?> snapshot) {
+        if (snapshot.hasData) {
+          return builder(snapshot.data!);
+          /* Builder를 받아서 처리로 변경
+          return Opacity(
+            opacity: asset == selectedImage ? 0.3 : 1,
+            child: Image.memory(
+              snapshot.data!,
+              fit: BoxFit.cover,
+            ),
+          );
+          */
+        } else {
+          return Container();
+        }
+      },
+    );
   }
 
   @override
