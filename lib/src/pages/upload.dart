@@ -75,12 +75,10 @@ class _UploadState extends State<Upload> {
       height: width,
       color: Colors.grey,
       child: selectedImage == null
-           ? Container()
-           : _photoWidget(selectedImage!, width.toInt(),
-              builder: (data) {
-                return Image.memory(data, fit: BoxFit.cover);
-              }
-             ),
+          ? Container()
+          : _photoWidget(selectedImage!, width.toInt(), builder: (data) {
+              return Image.memory(data, fit: BoxFit.cover);
+            }),
     );
   }
 
@@ -91,21 +89,23 @@ class _UploadState extends State<Upload> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap:() {
+            onTap: () {
               showModalBottomSheet(
                 context: context,
                 shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20)),
                 ),
                 isScrollControlled: true,
                 constraints: BoxConstraints(
-                  // SafeArea를 제외한 나머지 영역까지
-                  maxHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top
-                ),
+                    // SafeArea를 제외한 나머지 영역까지
+                    maxHeight: MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top),
                 builder: (_) => Container(
                   height: albums.length > 10
-                        ? Size.infinite.height
-                        : albums.length * 60,
+                      ? Size.infinite.height
+                      : albums.length * 60,
                   // color: Colors.amber,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +127,8 @@ class _UploadState extends State<Upload> {
                             children: List.generate(
                               albums.length,
                               (index) => Container(
-                                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 15, horizontal: 20),
                                 child: Text(albums[index].name),
                               ),
                             ),
@@ -202,32 +203,26 @@ class _UploadState extends State<Upload> {
         ),
         itemCount: imageList.length,
         itemBuilder: (BuildContext context, int index) {
-          return _photoWidget(
-            imageList[index], 200,
-            builder: (data) {
-              return GestureDetector(
-                onTap:() {
-                  selectedImage = imageList[index];
-                  update();
-                },
-                child: Opacity(
-                  opacity: imageList[index] == selectedImage ? 0.3 : 1,
-                  child: Image.memory(
-                    data,
-                    fit: BoxFit.cover,
-                  ),
+          return _photoWidget(imageList[index], 200, builder: (data) {
+            return GestureDetector(
+              onTap: () {
+                selectedImage = imageList[index];
+                update();
+              },
+              child: Opacity(
+                opacity: imageList[index] == selectedImage ? 0.3 : 1,
+                child: Image.memory(
+                  data,
+                  fit: BoxFit.cover,
                 ),
-              );
-            }
-          );
+              ),
+            );
+          });
         });
   }
 
   Widget _photoWidget(AssetEntity asset, int size,
-    {
-      required Widget Function(Uint8List) builder
-    }
-  ) {
+      {required Widget Function(Uint8List) builder}) {
     return FutureBuilder(
       future: asset.thumbnailDataWithSize(ThumbnailSize(size, size)),
       builder: (_, AsyncSnapshot<Uint8List?> snapshot) {
