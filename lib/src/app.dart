@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import 'pages/active_history.dart';
 import 'pages/home.dart';
+import 'pages/mypage.dart';
 import 'pages/search.dart';
 
 class App extends GetView<BottomNavController> { //StatelessWidget {
@@ -29,8 +30,8 @@ class App extends GetView<BottomNavController> { //StatelessWidget {
               },
             ),
             Container(), // Upload Dummy
-            ActiveHistory(),
-            Container(child: Center(child: Text("MYPAGE")),),
+            const ActiveHistory(),
+            const MyPage(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
