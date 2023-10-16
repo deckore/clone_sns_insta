@@ -9,9 +9,12 @@ environment:
 dependencies:
   cached_network_image: ^3.2.3
   expandable_text: ^2.3.0
+  firebase_auth: ^4.10.1
+  firebase_core: ^2.17.0
   flutter:
     sdk: flutter
   get: ^4.6.5
+  google_sign_in: ^6.1.5
   photo_manager: ^2.7.1
   quiver: ^3.2.1
 
