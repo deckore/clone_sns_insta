@@ -31,11 +31,11 @@ Future<UserCredential> signInWithGoogle() async {
         elevation: 0,
         title: Text("Login", style: TextStyle(color: Colors.black)),
       ),
-      body: ElevatedButton(
-        onPressed: () {
-          
-        },
-        child: Text("Google Login"),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: signInWithGoogle,
+          child: Text("Google Login"),
+        ),
       ),
     );
   }
