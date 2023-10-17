@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'app.dart';
+import 'controller/auth_controller.dart';
 import 'pages/login.dart';
 
-class Root extends StatelessWidget {
+class Root extends GetView<AuthController> {
 const Root({ Key? key }) : super(key: key);
 
   @override
@@ -13,7 +15,10 @@ const Root({ Key? key }) : super(key: key);
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (BuildContext _, AsyncSnapshot<User?> user) {
         if (user.hasData) {
-          return const App();
+          controller.loginUser(user.data!.uid);
+          return FutureBuilder(builder: (context, snapshot) {
+            return const App();
+          });
         } else {
           return Login();
         }
