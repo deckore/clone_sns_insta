@@ -4,7 +4,9 @@ import 'package:get/get.dart';
 
 import 'app.dart';
 import 'controller/auth_controller.dart';
+import 'models/insta_user.dart';
 import 'pages/login.dart';
+import 'pages/signup_page.dart';
 
 class Root extends GetView<AuthController> {
 const Root({ Key? key }) : super(key: key);
@@ -16,8 +18,14 @@ const Root({ Key? key }) : super(key: key);
       builder: (BuildContext _, AsyncSnapshot<User?> user) {
         if (user.hasData) {
           controller.loginUser(user.data!.uid);
-          return FutureBuilder(builder: (context, snapshot) {
-            return const App();
+          return FutureBuilder<IUser>(builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return const App();
+            } else {
+              return Obx(() => controller.user.value.uid != null
+                ? const App()
+                : SignupPage(uid: user.data!.uid));
+            }
           });
         } else {
           return Login();
