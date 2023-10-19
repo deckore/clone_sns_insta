@@ -3,6 +3,7 @@ import './components/image_data.dart';
 import './controller/bottom_nav_controller.dart';
 import 'package:get/get.dart';
 
+import 'components/avatar_widget.dart';
 import 'pages/active_history.dart';
 import 'pages/home.dart';
 import 'pages/mypage.dart';
@@ -70,6 +71,12 @@ class App extends GetView<BottomNavController> { //StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.grey,
                 ),
+                child: AvatarWidget(
+                        type: AvatarType.TYPE2,
+                        // thumbPath: controller.targetUser.value.thumbnail!,
+                        thumbPath: "https://cdn.pixabay.com/photo/2023/07/13/20/39/coffee-beans-8125757_1280.jpg",
+                        size: 30,
+                      ),
               ),
               label: ""
             ),
