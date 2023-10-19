@@ -1,12 +1,16 @@
 import 'package:clone_sns_insta/src/components/avatar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../components/image_data.dart';
 import '../components/user_card.dart';
+import '../controller/auth_controller.dart';
+import '../controller/mypage_controller.dart';
 
-class MyPage extends StatefulWidget {
+class MyPage extends GetView<MyPageController> { //StatefulWidget {
 const MyPage({ Key? key }) : super(key: key);
 
+/*
   @override
   State<MyPage> createState() => _MyPageState();
 }
@@ -19,6 +23,7 @@ class _MyPageState extends State<MyPage> with TickerProviderStateMixin {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
   }
+*/
 
 
   Widget _statisticsOne(String title, int value) {
@@ -37,7 +42,7 @@ class _MyPageState extends State<MyPage> with TickerProviderStateMixin {
   }
 
   Widget _information() {
-    return Column(
+    return Obx(() => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
@@ -47,7 +52,8 @@ class _MyPageState extends State<MyPage> with TickerProviderStateMixin {
             children: [
               AvatarWidget(
                 type: AvatarType.TYPE3,
-                thumbPath: "https://cdn.pixabay.com/photo/2023/07/13/20/39/coffee-beans-8125757_1280.jpg",
+                thumbPath: controller.targetUser.value.thumbnail!,
+                // thumbPath: "https://cdn.pixabay.com/photo/2023/07/13/20/39/coffee-beans-8125757_1280.jpg",
                 size: 80,
               ),
               const SizedBox(width: 10),
@@ -67,9 +73,12 @@ class _MyPageState extends State<MyPage> with TickerProviderStateMixin {
         const SizedBox(height: 10,),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14.0),
-          child: const Text("안녕하세요. 월급 독립을 꿈꾸는 맨딩입니다.", style: TextStyle(fontSize: 12, color: Colors.black,),),
+          child: Text(
+            controller.targetUser.value.description!,
+            style: const TextStyle(fontSize: 12, color: Colors.black,),),
         ),
       ],
+    )
     );
   }
 
@@ -123,7 +132,7 @@ class _MyPageState extends State<MyPage> with TickerProviderStateMixin {
 
   Widget _tabMenu() {
     return TabBar(
-      controller: tabController,
+      controller: controller.tabController,
       indicatorColor: Colors.black,
       indicatorWeight: 1,
       tabs: [
@@ -162,7 +171,10 @@ class _MyPageState extends State<MyPage> with TickerProviderStateMixin {
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Brutalist", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
+        title: Obx(() => Text(
+          controller.targetUser.value.nickname!,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black)),
+        ),
         elevation: 0,
         actions: [
           GestureDetector(

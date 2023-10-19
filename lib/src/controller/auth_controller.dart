@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:clone_sns_insta/src/binding/init_bindings.dart';
 import 'package:clone_sns_insta/src/repository/user_repository.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
@@ -15,6 +16,10 @@ class AuthController extends GetxController {
   Future<IUser?> loginUser(String uid) async {
     // DB 조회
     var userData = await UserRepository.loginUserByUid(uid);
+    if (userData != null) {
+      user(userData);
+      InitBinding.additionalBinding();
+    }
     return userData;
   }
 
@@ -54,6 +59,6 @@ class AuthController extends GetxController {
 
   void _submitSignup(IUser signupUser) async {
     var result = await UserRepository.signup(signupUser);
-    if (result) user(signupUser);
+    if (result) loginUser(signupUser.uid!);
   }
 }
