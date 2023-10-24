@@ -71,12 +71,14 @@ class App extends GetView<BottomNavController> { //StatelessWidget {
                   shape: BoxShape.circle,
                   color: Colors.grey,
                 ),
-                child: AvatarWidget(
+                child: //Obx(() => /* Trying..... */
+                       AvatarWidget(
                         type: AvatarType.TYPE2,
                         // thumbPath: controller.targetUser.value.thumbnail!,
                         thumbPath: "https://cdn.pixabay.com/photo/2023/07/13/20/39/coffee-beans-8125757_1280.jpg",
                         size: 30,
                       ),
+                      //),
               ),
               label: ""
             ),
