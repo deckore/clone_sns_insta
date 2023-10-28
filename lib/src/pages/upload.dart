@@ -1,85 +1,39 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:photo_manager/photo_manager.dart';
 // import 'package:get/get.dart';
 
 import '../components/image_data.dart';
+import '../controller/upload_controller.dart';
 
-class Upload extends StatefulWidget {
-  const Upload({Key? key}) : super(key: key);
+class Upload extends GetView<UploadController> {
+  Upload({Key? key}) : super(key: key);
 
-  @override
-  State<Upload> createState() => _UploadState();
-}
 
-class _UploadState extends State<Upload> {
-  List<AssetPathEntity> albums = <AssetPathEntity>[];
-  var headerTitle = '';
-  var imageList = <AssetEntity>[];
-  AssetEntity? selectedImage;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _loadPhotos();
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    _loadPhotos();
-  }
-
-  void _loadPhotos() async {
-    var result = await PhotoManager.requestPermissionExtend();
-    if (result.isAuth) {
-      albums = await PhotoManager.getAssetPathList(
-        type: RequestType.image,
-        filterOption: FilterOptionGroup(
-          imageOption: const FilterOption(
-            sizeConstraint: SizeConstraint(minHeight: 100, minWidth: 100),
-          ),
-          orders: [
-            const OrderOption(type: OrderOptionType.createDate, asc: false),
-          ],
-        ),
-      );
-      // Test Code
-      /*
-      albums.addAll([
-        AssetPathEntity()..name = '1',
-        AssetPathEntity()..name = '1',
-        AssetPathEntity()..name = '1',
-      ]);
-      */
-      _loadData();
-    }
-  }
-
-  void _loadData() async {
-    headerTitle = albums.first.name;
-    await _pagingPhotos();
-    update();
-  }
-
-  Future<void> _pagingPhotos() async {
-    var photos = await albums.first.getAssetListPaged(page: 0, size: 30);
-    imageList.addAll(photos);
-    selectedImage = imageList.first;
-  }
-
-  void update() => setState(() {});
+  // void update() => setState(() {});
 
   Widget _imagePreview() {
     /* GetX 의존성 제거 */
-    var width = MediaQuery.of(context).size.width;
-    return Container(
+    // var width = MediaQuery.of(context).size.width;
+    var width = Get.width;
+    return Obx(() => Container(
       // width: Get.width,
       // height: Get.width,
       width: width,
       height: width,
       color: Colors.grey,
-      child: selectedImage == null
-          ? Container()
-          : _photoWidget(selectedImage!, width.toInt(), builder: (data) {
+      child: _photoWidget(controller.selectedImage.value, width.toInt(), builder: (data) {
               return Image.memory(data, fit: BoxFit.cover);
             }),
-    );
+    ));
   }
 
   Widget _header() {
@@ -91,7 +45,7 @@ class _UploadState extends State<Upload> {
           GestureDetector(
             onTap: () {
               showModalBottomSheet(
-                context: context,
+                context: Get.context!,
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20),
@@ -100,12 +54,12 @@ class _UploadState extends State<Upload> {
                 isScrollControlled: true,
                 constraints: BoxConstraints(
                     // SafeArea를 제외한 나머지 영역까지
-                    maxHeight: MediaQuery.of(context).size.height -
-                        MediaQuery.of(context).padding.top),
+                    maxHeight: MediaQuery.of(Get.context!).size.height -
+                        MediaQuery.of(Get.context!).padding.top),
                 builder: (_) => Container(
-                  height: albums.length > 10
+                  height: controller.albums.length > 10
                       ? Size.infinite.height
-                      : albums.length * 60,
+                      : controller.albums.length * 60,
                   // color: Colors.amber,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,11 +79,11 @@ class _UploadState extends State<Upload> {
                         child: SingleChildScrollView(
                           child: Column(
                             children: List.generate(
-                              albums.length,
+                              controller.albums.length,
                               (index) => Container(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 20),
-                                child: Text(albums[index].name),
+                                child: Text(controller.albums[index].name),
                               ),
                             ),
                           ),
@@ -144,12 +98,13 @@ class _UploadState extends State<Upload> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text(
-                    headerTitle,
+                  Obx(() => Text(
+                    controller.headerTitle.value,
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 18,
                     ),
+                  ),
                   ),
                   const Icon(Icons.arrow_drop_down),
                 ],
@@ -192,7 +147,7 @@ class _UploadState extends State<Upload> {
   }
 
   Widget _imageSelectList() {
-    return GridView.builder(
+    return Obx(() => GridView.builder(
         physics: const NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -201,24 +156,28 @@ class _UploadState extends State<Upload> {
           mainAxisSpacing: 1,
           crossAxisSpacing: 1,
         ),
-        itemCount: imageList.length,
+        itemCount: controller.imageList.length,
         itemBuilder: (BuildContext context, int index) {
-          return _photoWidget(imageList[index], 200, builder: (data) {
+          return _photoWidget(controller.imageList[index], 200, builder: (data) {
             return GestureDetector(
               onTap: () {
-                selectedImage = imageList[index];
-                update();
+                controller.changeSelectedImage(controller.imageList[index]);
+                // update();
               },
-              child: Opacity(
-                opacity: imageList[index] == selectedImage ? 0.3 : 1,
+              child: Obx(() => Opacity(
+                opacity: controller.imageList[index] == controller.selectedImage.value
+                         ? 0.3
+                         : 1,
                 child: Image.memory(
                   data,
                   fit: BoxFit.cover,
                 ),
               ),
+              ),
             );
           });
-        });
+        })
+    );
   }
 
   Widget _photoWidget(AssetEntity asset, int size,
