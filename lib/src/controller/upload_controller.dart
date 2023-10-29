@@ -1,5 +1,13 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
+import 'package:image/image.dart' as imageLib;
 import 'package:photo_manager/photo_manager.dart';
+import 'package:photofilters/photofilters.dart';
+
+import '../pages/upload_description.dart';
 
 class UploadController extends GetxController {
   var albums = <AssetPathEntity>[];
@@ -11,10 +19,10 @@ class UploadController extends GetxController {
     width: 0,
     height: 0,
   ).obs;
+  File? filteredImage;
 
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     print("onInit -> UploadController");
     _loadPhotos();
@@ -47,18 +55,47 @@ class UploadController extends GetxController {
   }
 
   void _loadData() async {
-    headerTitle(albums.first.name);
-    await _pagingPhotos();
+    changeAlbum(albums.first);
     // update();
   }
 
-  Future<void> _pagingPhotos() async {
-    var photos = await albums.first.getAssetListPaged(page: 0, size: 30);
+  Future<void> _pagingPhotos(AssetPathEntity album) async {
+    imageList.clear();
+    var photos = await album.getAssetListPaged(page: 0, size: 30);
     imageList.addAll(photos);
     changeSelectedImage(imageList.first);
   }
 
   changeSelectedImage(AssetEntity image) {
     selectedImage(image);
+  }
+
+  void changeAlbum(AssetPathEntity album) async {
+    headerTitle(album.name);
+    await _pagingPhotos(album);
+  }
+
+  void gotoImageFilter() async {
+    var file = await selectedImage.value.file;
+    var fileName = basename(file!.path);
+    var image = imageLib.decodeImage(file.readAsBytesSync());
+    image = imageLib.copyResize(image!, width: 600);
+    Map imagefile = await Navigator.push(
+      Get.context!,
+      MaterialPageRoute(
+        builder: (context) => PhotoFilterSelector(
+              title: const Text("Photo Filter Example"),
+              image: image!,
+              filters: presetFiltersList,
+              filename: fileName,
+              loader: const Center(child: CircularProgressIndicator()),
+              fit: BoxFit.contain,
+            ),
+      ),
+    );
+    if (imagefile != null && imagefile.containsKey('image_filtered')) {
+      filteredImage = imagefile['image_filtered'];
+      Get.to(() => UploadDescription());
+    }
   }
 }
